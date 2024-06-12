@@ -1,9 +1,3 @@
-function component() {
-  const element = document.createElement('div');
+import './style.css';
 
-  element.innerHTML = 'Template Component';
-
-  return element;
-}
-
-document.body.appendChild(component());
+console.log("todo")

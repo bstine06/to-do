@@ -1,0 +1,31 @@
+body {
+  background-color: #222;
+  color: white;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.app-wrapper {
+  display: grid;
+  grid-template-rows: 1fr 7fr;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.header {
+  background-color: magenta;
+  text-align: center;
+}
+
+.sidebar {
+  background-color: darkmagenta;
+}
+
+.main-content {
+  background-color: #333;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+}

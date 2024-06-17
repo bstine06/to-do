@@ -15,23 +15,44 @@
     </div>
     <div class="content">
       <div class="sidebar">
-        sidebar
         <button id="new-task-button">
           New Task
         </button>
+        <button id="new-project-button">
+          New Project
+        </button>
+        <p class="sidebar-text">
+          select project:
+        </p>
+        
+        <select id="project-view-select"></select>
+     
       </div>
+      <div class="main-content-container">
+
+        <h2 id="project-title">Default List</h2>
       <div class="main-content" id="main-content">
-        main
+        
       </div>
+    </div>
     </div>
     <div id="new-task-modal" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" id="close-new-task-span">&times;</span>
-        <h2>New Task</h2>
-        <div class="form-container">
+        
           <form action="#" method="post" id="new-task-form">
+            <div class="form-row header-form-row">
+            <div class="form-group half-width">
+              <h2 class="inline-form-header">New Task</h2>
+              </div>
+              <div class="form-group half-width">
+                <select id="project-select" name="project" class="header-select">
+                </select>
+              </div>
+            </div>
+              
             
             <div class="form-group">
               <label for="title">*Title:</label>
@@ -75,6 +96,31 @@
         </div>
 
       </div>
+
+      <div id="new-project-modal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close" id="close-new-project-span">&times;</span>
+          
+            <form action="#" method="post" id="new-project-form">
+              <div class="form-row header-form-row">
+              <div class="form-group half-width">
+                <h2 class="inline-form-header">New Project</h2>
+                </div>
+              </div>
+                
+              
+              <div class="form-group">
+                <label for="title">*Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+  
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+  
+        </div>
     </div>
 </body>
 

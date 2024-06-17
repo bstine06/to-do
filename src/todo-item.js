@@ -4,8 +4,7 @@ export class TodoItem {
               description, 
               dueDate, 
               priority, 
-              notes,
-              complete) {
+              notes) {
     this.title = title;
     this.description = description;
     this.dueDate = dueDate;

@@ -8,7 +8,7 @@ projects["defaultList"] = defaultList;
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  let sampleTodoItem = new TodoItem("eat", "food", 121224, 2, "nachos");
+  let sampleTodoItem = new TodoItem("eat", "food", "2024-06-20", 2, "nachos");
   addToDoItem(sampleTodoItem, "defaultList");
   console.log(projects);
 });
@@ -73,9 +73,36 @@ function displayAllTasksInProject(project) {
   mainContent.innerHTML = '';
   const currentProject = projects[project];
   console.log(currentProject)
-  currentProject.forEach((element) => {
-    const displayTaskTitle = document.createElement('h2');
-    displayTaskTitle.innerHTML = element.title;
-    mainContent.appendChild(displayTaskTitle);
+  currentProject.forEach((task) => {
+    const taskDisplayElement = createTaskDisplayElement(task);
+    mainContent.appendChild(taskDisplayElement);
   });
+}
+
+function createTaskDisplayElement(task) {
+  const taskDisplayDiv = document.createElement('div');
+  const taskDisplayTitle = document.createElement('h3');
+  const taskDisplayDescription = document.createElement('p');
+  const taskDisplayDueDate = document.createElement('p');
+  const taskDisplayNotes = document.createElement('p');
+
+  taskDisplayTitle.innerHTML = task.title;
+  taskDisplayDescription.innerHTML = task.description;
+  taskDisplayDueDate.innerHTML = `Due: ${task.dueDate}`;
+  taskDisplayNotes.innerHTML = task.notes;
+
+  taskDisplayDiv.appendChild(taskDisplayTitle);
+  taskDisplayDiv.appendChild(taskDisplayDueDate);
+  taskDisplayDiv.appendChild(taskDisplayDescription);
+  taskDisplayDiv.appendChild(taskDisplayNotes);
+
+  switch (task.priority) {
+    case 1: taskDisplayDiv.classList.add('low-priority'); break;
+    case 2: taskDisplayDiv.classList.add('med-priority'); break;
+    default: taskDisplayDiv.classList.add('high-priority');
+  }
+
+  taskDisplayDiv.classList.add('task-display');
+
+  return taskDisplayDiv;
 }

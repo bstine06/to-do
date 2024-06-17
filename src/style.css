@@ -2,6 +2,7 @@ body {
   background-color: #222;
   color: white;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin: 0;
 }
 
 .app-wrapper {
@@ -23,11 +24,42 @@ body {
 
 .main-content {
   background-color: #333;
+  display: grid;
+  padding: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 10px; /* Adjust as needed */
+  align-items: start; /* Align grid items to the start of each row */
 }
 
 .content {
   display: grid;
   grid-template-columns: 1fr 5fr;
+}
+
+.task-display {
+  border: 3px magenta solid;
+  padding: 10px;
+  background-color: #444;
+  height: 6em;
+  overflow:hidden;
+}
+
+.task-display.low-priority {
+  border-left: 20px green solid;
+}
+.task-display.med-priority {
+  border-left: 20px yellow solid;
+}
+.task-display.high-priority {
+  border-left: 20px red solid;
+}
+
+.task-display p {
+  margin: 0;
+}
+
+.task-display h3 {
+  margin: 2px;
 }
 
 .modal {

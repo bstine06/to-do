@@ -1,17 +1,17 @@
 import './style.css';
 import { TodoItem } from './todo-item.js';
 
-
 const projects = {};
 
 const defaultList = [];
 projects["defaultList"] = defaultList;
 
 
-
-let sampleTodoItem = new TodoItem('eat', 'food', 121224, 2, 'nachos');
-addToDoItem(sampleTodoItem, "defaultList");
-console.log(projects);
+document.addEventListener("DOMContentLoaded", () => {
+  let sampleTodoItem = new TodoItem("eat", "food", 121224, 2, "nachos");
+  addToDoItem(sampleTodoItem, "defaultList");
+  console.log(projects);
+});
 
 
 function addToDoItem(newTodoItem, project) {
@@ -19,6 +19,8 @@ function addToDoItem(newTodoItem, project) {
     throw new Error(`project with name '${project}' does not exist in projects.`)
   }
   defaultList.push(newTodoItem);
+  console.log(projects);
+  displayAllTasksInProject("defaultList");
 }
 
 
@@ -55,6 +57,8 @@ newTaskForm.addEventListener('submit', (event) => {
     const newTask = new TodoItem(taskTitle, taskDescription, taskDueDate, taskPriority, taskNotes);
     console.log(newTask);
 
+    addToDoItem(newTask, "defaultList");
+
     closeAndResetTaskModal();
 })
 
@@ -63,4 +67,15 @@ function closeAndResetTaskModal() {
     newTaskForm.reset();
 }
 
+const mainContent = document.querySelector('#main-content');
 
+function displayAllTasksInProject(project) {
+  mainContent.innerHTML = '';
+  const currentProject = projects[project];
+  console.log(currentProject)
+  currentProject.forEach((element) => {
+    const displayTaskTitle = document.createElement('h2');
+    displayTaskTitle.innerHTML = element.title;
+    mainContent.appendChild(displayTaskTitle);
+  });
+}

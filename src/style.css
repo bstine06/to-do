@@ -47,6 +47,20 @@ body {
   padding: 20px;
 }
 
+.main-content-header {
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Align items vertically in the center */
+}
+
+.edit-button {
+  width: 20px;
+  height: 20px;
+  background:url(./images/pencil.svg) no-repeat;
+  background-color: #666;
+  cursor:pointer;
+  border:none;
+}
+
 .content {
   display: grid;
   grid-template-columns: 1fr 5fr;

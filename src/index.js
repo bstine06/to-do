@@ -12,6 +12,8 @@ view.setupNewProjectModalListeners();
 view.setupNewProjectSubmitListener(addProject);
 view.setupProjectViewSelectListener(getAllTasksInProject);
 view.setupProjectSelectListener(getAllTasksInProject);
+view.setupEditProjectModalListeners();
+view.setupEditProjectSubmitListener(editProject);
 
 function getProjectTitles() {
   return Object.keys(projects);
@@ -39,6 +41,14 @@ function addProject(projectTitle) {
   projects[projectTitle] = [];
   view.populateProjectsIntoSelects(getProjectTitles());
   return getAllTasksInProject(projectTitle);
+}
+
+function editProject(newProjectTitle, oldProjectTitle) {
+  projects[newProjectTitle] = projects[oldProjectTitle];
+  delete projects[oldProjectTitle];
+  view.populateProjectsIntoSelects(getProjectTitles());
+  
+  return getAllTasksInProject(newProjectTitle);
 }
 
 function getAllTasksInProject(project) {

@@ -5,6 +5,7 @@ export class View {
   constructor() {
     this.mainContent = document.querySelector("#main-content");
     this.projectTitle = document.querySelector("#project-title");
+    this.projectTitleEditButton = document.querySelector("#project-title-edit-button");
     this.projectViewSelect = document.querySelector("#project-view-select");
 
     this.newTaskButton = document.querySelector("#new-task-button");
@@ -17,6 +18,11 @@ export class View {
     this.newProjectModal = document.querySelector("#new-project-modal");
     this.closeNewProjectModalSpan = document.querySelector("#close-new-project-span");
     this.newProjectForm = document.querySelector("#new-project-form");
+
+    this.editProjectButton = document.querySelector("#edit-project-button");
+    this.editProjectModal = document.querySelector("#edit-project-modal");
+    this.closeEditProjectModalSpan = document.querySelector("#close-edit-project-span");
+    this.editProjectForm = document.querySelector("#edit-project-form");
   }
 
   displayTasks(tasks) {
@@ -180,6 +186,37 @@ export class View {
       this.displayTasks(getAllTasksInProjectCallback(projectTitle));
       this.updateProjectTitle(projectTitle);
     });
+  }
+
+  setupEditProjectModalListeners() {
+    this.closeEditProjectModalSpan.addEventListener("click", () => {
+      this.closeAndResetEditProjectModal();
+    });
+
+    this.editProjectButton.addEventListener("click", () => {
+      this.editProjectModal.style.display = "block";
+    });
+  }
+
+  setupEditProjectSubmitListener(editProjectCallback) {
+    this.editProjectForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      // Retrieve form data
+      const formData = new FormData(this.editProjectForm);
+      const newProjectTitle = formData.get("title");
+      const oldProjectTitle = this.projectTitle.innerHTML;
+
+      this.displayTasks(editProjectCallback(newProjectTitle, oldProjectTitle));
+      this.updateProjectTitle(newProjectTitle);
+
+      this.closeAndResetEditProjectModal();
+    });
+  }
+
+  closeAndResetEditProjectModal() {
+    this.editProjectModal.style.display = "none";
+    this.editProjectForm.reset();
   }
 
 }

@@ -24,104 +24,130 @@
         <p class="sidebar-text">
           select project:
         </p>
-        
+
         <select id="project-view-select"></select>
-     
+
       </div>
       <div class="main-content-container">
+        <div class="main-content-header">
+          <h2 id="project-title">Default List</h2> <button class="edit-button" id="edit-project-button"></button>
+        </div>
+        <div class="main-content" id="main-content">
 
-        <h2 id="project-title">Default List</h2>
-      <div class="main-content" id="main-content">
-        
+        </div>
       </div>
-    </div>
     </div>
     <div id="new-task-modal" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close" id="close-new-task-span">&times;</span>
-        
-          <form action="#" method="post" id="new-task-form">
-            <div class="form-row header-form-row">
+
+        <form action="#" method="post" id="new-task-form">
+          <div class="form-row header-form-row">
             <div class="form-group half-width">
               <h2 class="inline-form-header">New Task</h2>
-              </div>
-              <div class="form-group half-width">
-                <select id="project-select" name="project" class="header-select">
-                </select>
-              </div>
             </div>
-              
-            
-            <div class="form-group">
-              <label for="title">*Title:</label>
-              <input type="text" id="title" name="title" required>
+            <div class="form-group half-width">
+              <select id="project-select" name="project" class="header-select">
+              </select>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label for="title">*Title:</label>
+            <input type="text" id="title" name="title" required>
           </div>
 
           <div class="form-group">
-              <label for="description">Description:</label>
-              <textarea id="description" name="description" rows="4"></textarea>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"></textarea>
           </div>
 
           <div class="form-row">
-              <div class="form-group half-width">
-                  <label for="due-date">*Due Date:</label>
-                  <input type="date" id="due-date" name="due-date" required>
-              </div>
+            <div class="form-group half-width">
+              <label for="due-date">*Due Date:</label>
+              <input type="date" id="due-date" name="due-date" required>
+            </div>
 
-              <div class="form-group half-width">
-                  <fieldset>
-                      <legend>*Priority:</legend>
-                      <label for="low">
-                          <input type="radio" id="low" name="priority" value="1" required> Low
-                      </label>
-                      <label for="medium">
-                          <input type="radio" id="medium" name="priority" value="2" required> Medium
-                      </label>
-                      <label for="high">
-                          <input type="radio" id="high" name="priority" value="3" required> High
-                      </label>
-                  </fieldset>
-              </div>
+            <div class="form-group half-width">
+              <fieldset>
+                <legend>*Priority:</legend>
+                <label for="low">
+                  <input type="radio" id="low" name="priority" value="1" required> Low
+                </label>
+                <label for="medium">
+                  <input type="radio" id="medium" name="priority" value="2" required> Medium
+                </label>
+                <label for="high">
+                  <input type="radio" id="high" name="priority" value="3" required> High
+                </label>
+              </fieldset>
+            </div>
           </div>
 
           <div class="form-group">
-              <label for="notes">Notes:</label>
-              <textarea id="notes" name="notes" rows="4"></textarea>
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes" rows="4"></textarea>
           </div>
 
-            <button type="submit">Submit</button>
-          </form>
-        </div>
-
+          <button type="submit">Submit</button>
+        </form>
       </div>
 
-      <div id="new-project-modal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-content">
-          <span class="close" id="close-new-project-span">&times;</span>
-          
-            <form action="#" method="post" id="new-project-form">
-              <div class="form-row header-form-row">
-              <div class="form-group half-width">
-                <h2 class="inline-form-header">New Project</h2>
-                </div>
-              </div>
-                
-              
-              <div class="form-group">
-                <label for="title">*Title:</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-  
-              <button type="submit">Submit</button>
-            </form>
-          </div>
-  
-        </div>
     </div>
+
+    <div id="new-project-modal" class="modal">
+
+      <!-- Project Modal content -->
+      <div class="modal-content">
+        <span class="close" id="close-new-project-span">&times;</span>
+
+        <form action="#" method="post" id="new-project-form">
+          <div class="form-row header-form-row">
+            <div class="form-group half-width">
+              <h2 class="inline-form-header">New Project</h2>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label for="title">*Title:</label>
+            <input type="text" id="title" name="title" required>
+          </div>
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div id="edit-project-modal" class="modal">
+
+      <!-- Edit Project Modal content -->
+      <div class="modal-content">
+        <span class="close" id="close-edit-project-span">&times;</span>
+
+        <form action="#" method="post" id="edit-project-form">
+          <div class="form-row header-form-row">
+            <div class="form-group half-width">
+              <h2 class="inline-form-header">Edit Project Title</h2>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label for="title">*Title:</label>
+            <input type="text" id="title" name="title" required>
+          </div>
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
 </body>
 
 </html>

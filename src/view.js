@@ -1,4 +1,5 @@
 import { Task } from './task.js';
+const { formatDistanceToNowStrict } = require("date-fns");
 
 export class View {
   constructor() {
@@ -40,8 +41,16 @@ export class View {
 
     taskDisplayTitle.innerHTML = task.title;
     taskDisplayDescription.innerHTML = task.description;
-    taskDisplayDueDate.innerHTML = `Due: ${task.dueDate}`;
     taskDisplayNotes.innerHTML = task.notes;
+    if(task.dueDate.setHours(0,0,0,0) == (new Date()).setHours(0,0,0,0)) {
+      taskDisplayDueDate.innerHTML = 'today';
+    } else {
+      taskDisplayDueDate.innerHTML = formatDistanceToNowStrict(task.dueDate, {
+        addSuffix: true,
+        unit: 'day',
+        roundingMethod: 'floor'
+      });
+    }
 
     taskDisplayDiv.appendChild(taskDisplayTitle);
     taskDisplayDiv.appendChild(taskDisplayDueDate);
@@ -83,7 +92,7 @@ export class View {
       const formData = new FormData(this.newTaskForm);
       const taskTitle = formData.get("title");
       const taskDescription = formData.get("description");
-      const taskDueDate = formData.get("due-date");
+      const taskDueDate = new Date(formData.get("due-date") + 'T00:00:00');
       const taskPriority = formData.get("priority");
       const taskNotes = formData.get("notes");
       const taskProject = formData.get("project");

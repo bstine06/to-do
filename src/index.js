@@ -21,9 +21,8 @@ projects["Default List"] = [];
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  let sampleTask = new Task("eat", "food", "2024-06-20", 2, "nachos");
-  addTask(sampleTask, "Default List");
-  view.populateProjectsIntoSelects(getProjectTitles());
+  createSampleContent();
+  
 });
 
 //separated from view
@@ -44,4 +43,17 @@ function addProject(projectTitle) {
 
 function getAllTasksInProject(project) {
   return projects[project]
+}
+
+function createSampleContent() {
+  let sampleTask = new Task("low priority task", "eat", new Date(), 1, "nachos");
+  addTask(sampleTask, "Default List");
+
+  let sampleTask2 = new Task("med priority task", "food", new Date(), 2, "nachos");
+  addTask(sampleTask2, "Default List");
+
+  let sampleTask3 = new Task("high priority task", "munch", new Date(), 3, "nachos");
+  addTask(sampleTask3, "Default List");
+
+  view.populateProjectsIntoSelects(getProjectTitles());
 }

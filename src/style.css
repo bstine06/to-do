@@ -37,7 +37,7 @@ body {
   background-color: #333;
   display: grid;
   padding: 20px;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   grid-gap: 10px; /* Adjust as needed */
   align-items: start; /* Align grid items to the start of each row */
 }
@@ -53,7 +53,6 @@ body {
 }
 
 .task-display {
-  border: 3px magenta solid;
   padding: 10px;
   background-color: #444;
   height: 6em;
@@ -61,13 +60,13 @@ body {
 }
 
 .low-priority {
-  border-left: 20px green solid;
+  border: darkmagenta 3px solid;
 }
 .med-priority {
-  border-left: 20px yellow solid;
+  border: magenta 3px solid;
 }
 .high-priority {
-  border-left: 20px red solid;
+  border: rgb(255, 187, 255) 3px solid;
 }
 
 .task-display p {

@@ -60,13 +60,13 @@ body {
   overflow:hidden;
 }
 
-.task-display.low-priority {
+.low-priority {
   border-left: 20px green solid;
 }
-.task-display.med-priority {
+.med-priority {
   border-left: 20px yellow solid;
 }
-.task-display.high-priority {
+.high-priority {
   border-left: 20px red solid;
 }
 

@@ -1,4 +1,4 @@
-export class TodoItem {
+export class Task {
 
   constructor(title, 
               description, 

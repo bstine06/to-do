@@ -48,8 +48,16 @@ export class View {
     taskDisplayTitle.innerHTML = task.title;
     taskDisplayDescription.innerHTML = task.description;
     taskDisplayNotes.innerHTML = task.notes;
-    if(task.dueDate.setHours(0,0,0,0) == (new Date()).setHours(0,0,0,0)) {
+    const today = (new Date()).setHours(0,0,0,0)
+    if(task.dueDate.setHours(0,0,0,0) == today) {
       taskDisplayDueDate.innerHTML = 'today';
+    } else if (task.dueDate.setHours(0,0,0,0) > today) {
+      taskDisplayDueDate.innerHTML = formatDistanceToNowStrict(task.dueDate-1, {
+        addSuffix: true,
+        unit: 'day',
+        roundingMethod: 'ceil'
+      });
+      console.log("hiiiii")
     } else {
       taskDisplayDueDate.innerHTML = formatDistanceToNowStrict(task.dueDate, {
         addSuffix: true,

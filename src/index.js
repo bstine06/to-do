@@ -14,6 +14,8 @@ view.setupProjectViewSelectListener(getAllTasksInProject);
 view.setupProjectSelectListener(getAllTasksInProject);
 view.setupEditProjectModalListeners();
 view.setupEditProjectSubmitListener(editProject);
+view.setupEditTaskSubmitListener(editTask);
+view.setupEditTaskModalListeners();
 
 function getProjectTitles() {
   return Object.keys(projects);
@@ -37,6 +39,17 @@ function addTask(newTask, projectTitle) {
   view.updateProjectTitle(projectTitle);
 }
 
+function editTask(modifiedTask, projectTitle) {
+  const index = projects[projectTitle].findIndex(task => task.UUID === modifiedTask.UUID);
+
+  // Check if the object was found
+  if (index !== -1) {
+    // Remove the object from the array
+    projects[projectTitle].splice(index, 1);
+    addTask(modifiedTask, projectTitle);
+  }
+}
+
 function addProject(projectTitle) {
   projects[projectTitle] = [];
   view.populateProjectsIntoSelects(getProjectTitles());
@@ -56,13 +69,13 @@ function getAllTasksInProject(project) {
 }
 
 function createSampleContent() {
-  let sampleTask = new Task("low priority task", "eat", new Date(), 1, "nachos");
+  let sampleTask = new Task("low priority task", "eat", new Date(), 'low-priority', "nachos");
   addTask(sampleTask, "Default List");
 
-  let sampleTask2 = new Task("med priority task", "food", new Date(), 2, "nachos");
+  let sampleTask2 = new Task("med priority task", "food", new Date(), 'medium-priority', "nachos");
   addTask(sampleTask2, "Default List");
 
-  let sampleTask3 = new Task("high priority task", "munch", new Date(), 3, "nachos");
+  let sampleTask3 = new Task("high priority task", "munch", new Date(), 'high-priority', "nachos");
   addTask(sampleTask3, "Default List");
 
   view.populateProjectsIntoSelects(getProjectTitles());

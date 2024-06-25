@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export class Task {
 
   constructor(title, 
@@ -11,6 +13,7 @@ export class Task {
     this.priority = priority;
     this.notes = notes;
     this.complete = false;
+    this.UUID = uuidv4();
   }
 
 }

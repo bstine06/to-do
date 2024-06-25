@@ -73,14 +73,21 @@ body {
   overflow:hidden;
 }
 
-.low-priority {
-  border: darkmagenta 3px solid;
+.task-display:hover {
+  background: rgb(153,82,148);
+  background: linear-gradient(270deg, rgba(153,82,148,1) 0%, darkmagenta 100%);
+  border: 3px white solid;
 }
-.med-priority {
-  border: magenta 3px solid;
+
+.low-priority {
+  border: #666 3px solid;
+}
+.medium-priority {
+  border: rgb(159, 101, 159) 3px solid;
 }
 .high-priority {
-  border: rgb(255, 187, 255) 3px solid;
+  border: magenta 3px solid;
+  background-color: #5c3e5a;
 }
 
 .task-display p {

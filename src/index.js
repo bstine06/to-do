@@ -65,12 +65,23 @@ function editTask(modifiedTask, projectTitle) {
 }
 
 function addProject(projectTitle) {
+  //throw error if duplicate name is trying to be added
+  if (projects.hasOwnProperty(projectTitle)) {
+    throw new Error("Cannot assign duplicate project names");
+  }
   projects[projectTitle] = [];
   view.populateProjectsIntoSelects(getProjectTitles());
   return getAllTasksInProject(projectTitle);
 }
 
 function editProject(newProjectTitle, oldProjectTitle) {
+  //immediately return if its the same name
+  if (newProjectTitle === oldProjectTitle) return getAllTasksInProject(newProjectTitle);
+  
+  //throw error if duplicate name is trying to be added
+  if (projects.hasOwnProperty(newProjectTitle)) {
+    throw new Error("Cannot assign duplicate project names");
+  }
   projects[newProjectTitle] = projects[oldProjectTitle];
   delete projects[oldProjectTitle];
   view.populateProjectsIntoSelects(getProjectTitles());

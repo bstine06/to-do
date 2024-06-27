@@ -175,13 +175,13 @@ export class View {
   }
 
   setupNewProjectSubmitListener(addProjectCallback) {
+    console.log("setting up new project submit listener");
     this.newProjectForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
       // Retrieve form data
       const formData = new FormData(this.newProjectForm);
       const projectTitle = formData.get("title");
-      addProjectCallback(projectTitle);
 
       this.displayTasks(addProjectCallback(projectTitle));
       this.updateProjectTitle(projectTitle);

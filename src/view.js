@@ -82,12 +82,15 @@ export class View {
       });
     }
 
+
     taskDisplayDiv.appendChild(taskDisplayTitle);
     taskDisplayDiv.appendChild(taskDisplayDueDate);
 
     taskDisplayDiv.classList.add(task.priority);
 
     taskDisplayDiv.classList.add("task-display");
+
+    this.createCompleteButton(task.UUID, taskDisplayDiv);
 
     taskDisplayDiv.addEventListener('click', () => {
       console.log("task clicked");
@@ -99,6 +102,24 @@ export class View {
     });
 
     return taskDisplayDiv;
+  }
+
+  bindCompleteElement(handler) {
+    this.mainContent.addEventListener('click', (event) => {
+        if (event.target.classList.contains('complete-button')) {
+            this.closeTaskDetailsModal();
+            const uuid = event.target.getAttribute('data-uuid');
+            handler(uuid, this.projectViewSelect.value);
+        }
+    });
+  }
+
+  createCompleteButton(uuid, parentDiv) {
+    const button = document.createElement('button');
+    button.classList.add('complete-button');
+    button.setAttribute('data-uuid', uuid);
+    button.textContent = 'Complete';
+    parentDiv.appendChild(button);
   }
 
   setupNewTaskModalListeners() {

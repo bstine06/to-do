@@ -98,6 +98,12 @@ body {
   margin: 2px;
 }
 
+.complete-button {
+  width: auto;
+  height: auto;
+  font-size: 12px;
+}
+
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */

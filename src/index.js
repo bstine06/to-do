@@ -16,9 +16,23 @@ view.setupEditProjectModalListeners();
 view.setupEditProjectSubmitListener(editProject);
 view.setupEditTaskSubmitListener(editTask);
 view.setupEditTaskModalListeners();
+view.bindCompleteElement(handleCompleteElement.bind(this));
 
 function getProjectTitles() {
   return Object.keys(projects);
+}
+
+function handleCompleteElement(uuid, projectTitle) {
+  console.log(`Complete element with UUID: ${uuid}`);
+  // Perform the deletion logic here
+  const index = projects[projectTitle].findIndex(task => task.UUID === uuid);
+
+  // Check if the object was found
+  if (index !== -1) {
+    // Remove the object from the array
+    projects[projectTitle].splice(index, 1);
+  }
+  view.displayTasks(projects[projectTitle]);
 }
 
 projects["Default List"] = [];

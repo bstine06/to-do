@@ -38,11 +38,13 @@ export class View {
     this.newProjectModal = document.querySelector("#new-project-modal");
     this.closeNewProjectModalSpan = document.querySelector("#close-new-project-span");
     this.newProjectForm = document.querySelector("#new-project-form");
+    this.newProjectModalErrorText = document.querySelector("#new-project-modal-error-text");
 
     this.editProjectButton = document.querySelector("#edit-project-button");
     this.editProjectModal = document.querySelector("#edit-project-modal");
     this.closeEditProjectModalSpan = document.querySelector("#close-edit-project-span");
     this.editProjectForm = document.querySelector("#edit-project-form");
+    this.editProjectModalErrorText = document.querySelector("#edit-project-modal-error-text");
   }
 
   displayTasks(tasks) {
@@ -183,16 +185,21 @@ export class View {
       const formData = new FormData(this.newProjectForm);
       const projectTitle = formData.get("title");
 
-      this.displayTasks(addProjectCallback(projectTitle));
-      this.updateProjectTitle(projectTitle);
-
-      this.closeAndResetProjectModal();
+      try {
+        this.displayTasks(addProjectCallback(projectTitle));
+        this.updateProjectTitle(projectTitle);
+        this.closeAndResetProjectModal();
+      } catch (error) {
+        this.newProjectModalErrorText.innerHTML = error.message;
+      }
+      
     });
   }
 
   closeAndResetProjectModal() {
     this.newProjectModal.style.display = "none";
     this.newProjectForm.reset();
+    this.newProjectModalErrorText.innerHTML = "";
   }
 
   populateProjectsIntoSelects(projectTitles) {
@@ -256,16 +263,22 @@ export class View {
       const newProjectTitle = formData.get("title");
       const oldProjectTitle = this.projectTitle.innerHTML;
 
-      this.displayTasks(editProjectCallback(newProjectTitle, oldProjectTitle));
-      this.updateProjectTitle(newProjectTitle);
+      try {
+        this.displayTasks(editProjectCallback(newProjectTitle, oldProjectTitle));
+        this.updateProjectTitle(newProjectTitle);
 
-      this.closeAndResetEditProjectModal();
+        this.closeAndResetEditProjectModal();
+      } catch (error) {
+        this.editProjectModalErrorText.innerHTML = error.message;
+      }
+      
     });
   }
 
   closeAndResetEditProjectModal() {
     this.editProjectModal.style.display = "none";
     this.editProjectForm.reset();
+    this.newProjectModalErrorText.innerHTML = "";
   }
 
   displayTaskDetails(task) {

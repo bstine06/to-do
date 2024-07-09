@@ -6,14 +6,19 @@ export class Task {
               description, 
               dueDate, 
               priority, 
-              notes) {
+              notes,
+              UUID) {
     this.title = title;
     this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
     this.notes = notes;
     this.complete = false;
-    this.UUID = uuidv4();
+    if (!UUID === null) {
+      this.UUID = UUID;
+    } else {
+      this.UUID = uuidv4();
+    }
   }
 
 }

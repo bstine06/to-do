@@ -1,25 +1,50 @@
 import './style.css';
 import { Task } from './task.js';
+import {Project} from './project.js';
 import { View } from './view.js';
+import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth } from './api.js';
 
-const projects = {};
+let projects = [];
 
 const view = new View();
+let focusTask = new Task();
+
+let connection = false;
 
 view.setupNewTaskModalListeners();
 view.setupNewTaskSubmitListener(addTask);
 view.setupNewProjectModalListeners();
 view.setupNewProjectSubmitListener(addProject);
-view.setupProjectViewSelectListener(getAllTasksInProject);
-view.setupProjectSelectListener(getAllTasksInProject);
+view.setupProjectViewSelectListener(getAllTasksInProject, setFocusTask);
+view.setupProjectSelectListener(getAllTasksInProject, setFocusTask);
 view.setupEditProjectModalListeners();
 view.setupEditProjectSubmitListener(editProject);
 view.setupEditTaskSubmitListener(editTask);
-view.setupEditTaskModalListeners();
+view.setupEditTaskModalListeners(getFocusTask);
 view.bindCompleteElement(handleCompleteElement.bind(this));
 
+initialize();
+
+
+async function initialize() {
+  try {
+    await checkServerHealth();
+    projects = await getAllProjects();
+    await fetchAndPopulateAllTasksForAllProjects();
+    view.displayTasks(projects[0].tasks, setFocusTask);
+    view.updateProjectTitle(projects[0].title);
+    view.populateProjectsIntoSelects(getProjectTitles());
+  } catch (error) {
+    console.error("An error occurred during initialization:", error);
+  }
+}
+
+
 function getProjectTitles() {
-  return Object.keys(projects);
+  const projectTitles = projects.map((project) => {
+    return project.title;
+  });
+  return projectTitles;
 }
 
 function handleCompleteElement(uuid, projectTitle) {
@@ -32,16 +57,23 @@ function handleCompleteElement(uuid, projectTitle) {
     // Remove the object from the array
     projects[projectTitle].splice(index, 1);
   }
-  view.displayTasks(projects[projectTitle]);
+  view.displayTasks(projects[projectTitle], setFocusTask);
 }
 
 projects["Default List"] = [];
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  createSampleContent();
+// document.addEventListener("DOMContentLoaded", () => {
+//   createSampleContent();
   
-});
+// });
+
+function setFocusTask(task) {
+  focusTask = task;
+}
+
+function getFocusTask(task) {
+  return focusTask;
+}
 
 //separated from view
 function addTask(newTask, projectTitle) {
@@ -49,7 +81,7 @@ function addTask(newTask, projectTitle) {
     throw new Error(`project with name '${projectTitle}' does not exist in projects.`)
   }
   projects[projectTitle].push(newTask);
-  view.displayTasks(getAllTasksInProject(projectTitle));
+  view.displayTasks(getAllTasksInProject(projectTitle), setFocusTask);
   view.updateProjectTitle(projectTitle);
 }
 
@@ -70,7 +102,6 @@ function addProject(projectTitle) {
     throw new Error("Cannot assign duplicate project names");
   }
   projects[projectTitle] = [];
-  view.populateProjectsIntoSelects(getProjectTitles());
   return getAllTasksInProject(projectTitle);
 }
 
@@ -89,9 +120,90 @@ function editProject(newProjectTitle, oldProjectTitle) {
   return getAllTasksInProject(newProjectTitle);
 }
 
-function getAllTasksInProject(project) {
-  return projects[project]
+function getAllTasksInProject(projectTitle) {
+  for (const project of projects) {
+    if (project.title === projectTitle) {
+      return project.tasks;
+    }
+  }
+  return undefined;
 }
+
+async function fetchAllTasksInProject(projectUUID) {
+  try {
+    const projectTasks = await apiGetAllTasksInProject(projectUUID);
+    return projectTasks;
+  } catch (error) {
+    console.error('Error:', error);
+    console.log("Display error message in HTML");
+  }
+}
+
+async function getAllTasks() {
+  try {
+    const tasks = await apiGetAllTasks();
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+async function getAllProjects() {
+  try {
+    const apiResponse = await apiGetAllProjects();
+    return makeProjectObjects(apiResponse);
+    // view.populateProjectsIntoSelects(getProjectTitles());
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+async function checkServerHealth() {
+  try {
+    await apiCheckServerHealth();
+    return true;
+  } catch (error) {
+    console.error('Error:', error);
+    return false;
+  }
+}
+
+function makeTaskObjects(taskData) {
+  const tasks = []
+  taskData.forEach((t) => {
+    const [year, month, day] = t.due_date.split('-').map(Number);
+    const dueDate = new Date(year, month - 1, day);
+    const newTask = new Task(t.name, t.description, dueDate, t.priority, t.notes, t.uuid);
+    tasks.push(newTask);
+  })
+  return tasks;
+}
+
+function makeProjectObjects(projectData) {
+  const myProjects = [];
+  projectData.forEach((p, index) => {
+    const newProject = new Project(p.name, p.uuid);
+    myProjects.push(newProject);
+  });
+  return myProjects;
+}
+
+async function fetchAndPopulateAllTasksForAllProjects() {
+  for (const project of projects) {
+    try {
+      const projectTasks = await fetchAllTasksInProject(project.UUID);
+      project.tasks = makeTaskObjects(projectTasks);
+    } catch (error) {
+      console.error(`Failed to fetch tasks for project ${project.UUID}:`, error);
+    }
+  }
+}
+
+
+
+
+
+
+
 
 function createSampleContent() {
   let sampleTask = new Task("low priority task", "eat", new Date(), 'low-priority', "nachos");

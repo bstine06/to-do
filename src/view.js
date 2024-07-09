@@ -47,12 +47,16 @@ export class View {
     this.editProjectModalErrorText = document.querySelector("#edit-project-modal-error-text");
   }
 
-  displayTasks(tasks) {
+  displayTasks(tasks, setFocusTaskCallback) {
     this.mainContent.innerHTML = "";
-    tasks.forEach((task) => {
-      const taskDisplayElement = this.createTaskDisplayElement(task);
-      this.mainContent.appendChild(taskDisplayElement);
-    });
+    if (tasks === undefined) {
+    console.log("NO TASKS TO DISPLAY");
+    } else {
+      tasks.forEach((task) => {
+        const taskDisplayElement = this.createTaskDisplayElement(task, setFocusTaskCallback);
+        this.mainContent.appendChild(taskDisplayElement);
+      });
+    }
   }
 
   updateProjectTitle(title) {
@@ -60,12 +64,13 @@ export class View {
     this.updateProjectSelects(title);
   }
 
-  createTaskDisplayElement(task) {
+  createTaskDisplayElement(task, setFocusTaskCallback) {
     const taskDisplayDiv = document.createElement("div");
     const taskDisplayTitle = document.createElement("h3");
     const taskDisplayDueDate = document.createElement("p");
 
     taskDisplayTitle.innerHTML = task.title;
+
     const today = (new Date()).setHours(0,0,0,0)
     if(task.dueDate.setHours(0,0,0,0) == today) {
       taskDisplayDueDate.innerHTML = 'today';
@@ -75,7 +80,6 @@ export class View {
         unit: 'day',
         roundingMethod: 'ceil'
       });
-      console.log("hiiiii")
     } else {
       taskDisplayDueDate.innerHTML = formatDistanceToNowStrict(task.dueDate, {
         addSuffix: true,
@@ -94,9 +98,10 @@ export class View {
 
     this.createCompleteButton(task.UUID, taskDisplayDiv);
 
+    
+
     taskDisplayDiv.addEventListener('click', () => {
-      console.log("task clicked");
-      this.displayTaskDetails(task);
+      this.displayTaskDetails(task, setFocusTaskCallback);
     })
 
     this.closeTaskDetailsModalSpan.addEventListener("click", () => {
@@ -177,7 +182,6 @@ export class View {
   }
 
   setupNewProjectSubmitListener(addProjectCallback) {
-    console.log("setting up new project submit listener");
     this.newProjectForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
@@ -217,7 +221,6 @@ export class View {
 
       this.projectSelect.appendChild(projectOption);
       this.projectViewSelect.appendChild(projectViewOption);
-      console.log(this.editTaskProjectSelect)
       this.editTaskProjectSelect.appendChild(editTaskProjectOption);
     });
   }
@@ -228,18 +231,18 @@ export class View {
     this.editTaskProjectSelect.value = projectTitle;
   }
 
-  setupProjectViewSelectListener(getAllTasksInProjectCallback) {
+  setupProjectViewSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
     this.projectViewSelect.addEventListener("change", (event) => {
       const projectTitle = this.projectViewSelect.value;
-      this.displayTasks(getAllTasksInProjectCallback(projectTitle));
+      this.displayTasks(getAllTasksInProjectCallback(projectTitle), setFocusTaskCallback);
       this.updateProjectTitle(projectTitle);
     });
   }
 
-  setupProjectSelectListener(getAllTasksInProjectCallback) {
+  setupProjectSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
     this.projectSelect.addEventListener("change", (event) => {
       const projectTitle = this.projectSelect.value;
-      this.displayTasks(getAllTasksInProjectCallback(projectTitle));
+      this.displayTasks(getAllTasksInProjectCallback(projectTitle), setFocusTaskCallback);
       this.updateProjectTitle(projectTitle);
     });
   }
@@ -281,8 +284,8 @@ export class View {
     this.newProjectModalErrorText.innerHTML = "";
   }
 
-  displayTaskDetails(task) {
-    console.log(task);
+  displayTaskDetails(task, setFocusTaskCallback) {
+    setFocusTaskCallback(task);
     this.taskDetailsTitle.innerHTML = task.title;
     this.taskDetailsDescription.innerHTML = "Description: " + task.description;
     this.taskDetailsDueDate.innerHTML = "Due: " + format(task.dueDate, 'EEEE, MMMM dd yyyy');
@@ -298,22 +301,22 @@ export class View {
     this.taskDetailsModal.style.display = "none";
   }
 
-  setupEditTaskModalListeners() {
+  setupEditTaskModalListeners(getFocusTask) {
+    
     this.editTaskButton.addEventListener("click", () => {
-      this.editTaskTitle.value = this.taskDetailsTitle.innerHTML;
-      this.editTaskDescription.value = this.taskDetailsDescription.innerHTML.split(" ")[1];
-      const dateString = this.taskDetailsDueDate.innerHTML.split(" ")[2] + " " + this.taskDetailsDueDate.innerHTML.split(" ")[3] + " " + this.taskDetailsDueDate.innerHTML.split(" ")[4];
+      const focusTask = getFocusTask();
+      this.editTaskTitle.value = focusTask.title;
+      this.editTaskDescription.value = focusTask.description;
+      const dateString = focusTask.dueDate;
       const date = new Date(dateString);
-      console.log(date);
       const formattedDate = date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
       this.editTaskDueDate.value = formattedDate;
-      const selectedPriority = `${this.taskDetailsPriority.innerHTML.split(" ")[1]}-priority`;
-      document.querySelector(`input[name="edit-task-priority"][value="${selectedPriority}"]`).checked = true;
-      this.editTaskNotes.value = this.taskDetailsNotes.innerHTML.split(" ")[1];
+      const selectedPriority = focusTask.priority;
+      //document.querySelector(`input[name="edit-task-priority"][value="${selectedPriority}"]`).checked = true;
+      this.editTaskNotes.value = focusTask.notes;
       this.editTaskModal.style.display = "block";
       this.editTaskProjectSelect.value = this.projectViewSelect.value;
-      console.log(`UUID: ${this.taskDetailsUUID.innerHTML}`);
-      document.querySelector("#edit-task-uuid").value = this.taskDetailsUUID.value;
+      document.querySelector("#edit-task-uuid").value = focusTask.UUID;
     });
 
     this.closeEditTaskModalSpan.addEventListener("click", () => {
@@ -341,7 +344,6 @@ export class View {
         taskPriority,
         taskNotes
       );
-      console.log(modifiedTask);
       modifiedTask.UUID = this.taskDetailsUUID.innerHTML;
       editTaskCallback(modifiedTask, taskProject);
 

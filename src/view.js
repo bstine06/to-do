@@ -45,6 +45,8 @@ export class View {
     this.closeEditProjectModalSpan = document.querySelector("#close-edit-project-span");
     this.editProjectForm = document.querySelector("#edit-project-form");
     this.editProjectModalErrorText = document.querySelector("#edit-project-modal-error-text");
+    
+    this.errorMessage = document.querySelector('#error-message');
   }
 
   displayTasks(tasks, setFocusTaskCallback) {
@@ -57,6 +59,12 @@ export class View {
         this.mainContent.appendChild(taskDisplayElement);
       });
     }
+  }
+
+  displayErrorMessage(message) {
+    this.errorMessage.innerHTML = message;
+    this.errorMessage.style.display = "block";
+    this.editProjectButton.style.display = "none";
   }
 
   updateProjectTitle(title) {
@@ -140,7 +148,7 @@ export class View {
     });
   }
 
-  setupNewTaskSubmitListener(callback) {
+  setupNewTaskSubmitListener(addTaskCallback) {
     this.newTaskForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
@@ -148,7 +156,8 @@ export class View {
       const formData = new FormData(this.newTaskForm);
       const taskTitle = formData.get("title");
       const taskDescription = formData.get("description");
-      const taskDueDate = new Date(formData.get("due-date") + 'T00:00:00');
+      console.log(formData.get("due-date"));
+      const taskDueDate = new Date(formData.get("due-date"));
       const taskPriority = formData.get("priority");
       const taskNotes = formData.get("notes");
       const taskProject = formData.get("project");
@@ -160,7 +169,7 @@ export class View {
         taskPriority,
         taskNotes
       );
-      callback(newTask, taskProject);
+      addTaskCallback(newTask, taskProject);
 
       this.closeAndResetTaskModal();
     });
@@ -206,43 +215,44 @@ export class View {
     this.newProjectModalErrorText.innerHTML = "";
   }
 
-  populateProjectsIntoSelects(projectTitles) {
+  populateProjectsIntoSelects(projects) {
     this.projectViewSelect.innerHTML = "";
     this.projectSelect.innerHTML = "";
     this.editTaskProjectSelect.innerHTML = "";
-    projectTitles.forEach((projectTitle) => {
-      const projectOption = document.createElement("option");
-      const projectViewOption = document.createElement("option");
-      const editTaskProjectOption = document.createElement("option");
-
-      projectOption.innerHTML = projectTitle;
-      projectViewOption.innerHTML = projectTitle;
-      editTaskProjectOption.innerHTML = projectTitle;
-
-      this.projectSelect.appendChild(projectOption);
-      this.projectViewSelect.appendChild(projectViewOption);
-      this.editTaskProjectSelect.appendChild(editTaskProjectOption);
+    projects.forEach((project) => {
+      this.projectSelect.appendChild(this.createOption(project.UUID, project.title));
+      this.projectViewSelect.appendChild(this.createOption(project.UUID, project.title));
+      this.editTaskProjectSelect.appendChild(this.createOption(project.UUID, project.title));
     });
   }
 
+  createOption(value, text) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.innerHTML = text;
+    return option;
+}
+
   updateProjectSelects(projectTitle) {
-    this.projectViewSelect.value = projectTitle;
-    this.projectSelect.value = projectTitle;
-    this.editTaskProjectSelect.value = projectTitle;
+    this.projectViewSelect.text = projectTitle;
+    this.projectSelect.text = projectTitle;
+    this.editTaskProjectSelect.text = projectTitle;
   }
 
   setupProjectViewSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
     this.projectViewSelect.addEventListener("change", (event) => {
-      const projectTitle = this.projectViewSelect.value;
-      this.displayTasks(getAllTasksInProjectCallback(projectTitle), setFocusTaskCallback);
+      const projectUUID = this.projectViewSelect.value;
+      const projectTitle = this.projectViewSelect.options[this.projectViewSelect.selectedIndex].innerHTML;
+      this.displayTasks(getAllTasksInProjectCallback(projectUUID), setFocusTaskCallback);
       this.updateProjectTitle(projectTitle);
     });
   }
 
   setupProjectSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
     this.projectSelect.addEventListener("change", (event) => {
-      const projectTitle = this.projectSelect.value;
-      this.displayTasks(getAllTasksInProjectCallback(projectTitle), setFocusTaskCallback);
+      const projectUUID = this.projectSelect.value;
+      const projectTitle = this.projectSelect.options[this.projectSelect.selectedIndex].innerHTML;
+      this.displayTasks(getAllTasksInProjectCallback(projectUUID), setFocusTaskCallback);
       this.updateProjectTitle(projectTitle);
     });
   }
@@ -295,6 +305,7 @@ export class View {
     this.taskDetailsUUID.innerHTML = task.UUID;
 
     this.taskDetailsModal.style.display = "block";
+    console.log(task.UUID);
   }
 
   closeTaskDetailsModal() {
@@ -332,7 +343,8 @@ export class View {
       const formData = new FormData(this.editTaskForm);
       const taskTitle = formData.get("title");
       const taskDescription = formData.get("description");
-      const taskDueDate = new Date(formData.get("due-date") + 'T00:00:00');
+      console.log(formData.get("due-date"));
+      const taskDueDate = new Date(formData.get("due-date"));
       const taskPriority = formData.get("edit-task-priority");
       const taskNotes = formData.get("notes");
       const taskProject = formData.get("project");
@@ -345,6 +357,8 @@ export class View {
         taskNotes
       );
       modifiedTask.UUID = this.taskDetailsUUID.innerHTML;
+      console.log(modifiedTask);
+      console.log(taskProject);
       editTaskCallback(modifiedTask, taskProject);
 
       this.closeAndResetEditTaskModal();

@@ -14,7 +14,7 @@ export class Task {
     this.priority = priority;
     this.notes = notes;
     this.complete = false;
-    if (!UUID === null) {
+    if (UUID != null) {
       this.UUID = UUID;
     } else {
       this.UUID = uuidv4();

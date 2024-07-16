@@ -1,5 +1,6 @@
 import './style.css';
 import { Task } from './task.js';
+import { format } from 'date-fns';
 import {Project} from './project.js';
 import { View } from './view.js';
 import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth } from './api.js';
@@ -33,7 +34,8 @@ async function initialize() {
     await fetchAndPopulateAllTasksForAllProjects();
     view.displayTasks(projects[0].tasks, setFocusTask);
     view.updateProjectTitle(projects[0].title);
-    view.populateProjectsIntoSelects(getProjectTitles());
+    view.populateProjectsIntoSelects(projects);
+    console.log(projects);
   } catch (error) {
     console.error("An error occurred during initialization:", error);
   }
@@ -47,17 +49,20 @@ function getProjectTitles() {
   return projectTitles;
 }
 
-function handleCompleteElement(uuid, projectTitle) {
-  console.log(`Complete element with UUID: ${uuid}`);
-  // Perform the deletion logic here
-  const index = projects[projectTitle].findIndex(task => task.UUID === uuid);
+function getProjectUUIDs() {
+  const projectUUIDs = projects.map((project) => {
+    return project.UUID;
+  });
+  return projectUUIDs;
+}
 
-  // Check if the object was found
-  if (index !== -1) {
-    // Remove the object from the array
-    projects[projectTitle].splice(index, 1);
-  }
-  view.displayTasks(projects[projectTitle], setFocusTask);
+function handleCompleteElement(taskUUID, projectUUID) {
+  console.log(`Complete element with UUID: ${taskUUID}`);
+  const projectIndex = projects.findIndex(project => project.UUID === projectUUID);
+  const taskIndex = projects[projectIndex].tasks.findIndex(task => task.UUID === taskUUID);
+  console.log(projectIndex);
+  delete projects[projectIndex].tasks[taskIndex];
+  view.displayTasks(projects[projectIndex].tasks, setFocusTask);
 }
 
 projects["Default List"] = [];
@@ -75,24 +80,41 @@ function getFocusTask(task) {
   return focusTask;
 }
 
-//separated from view
 function addTask(newTask, projectTitle) {
-  if (!(projectTitle in projects)) {
-    throw new Error(`project with name '${projectTitle}' does not exist in projects.`)
+  const projectUUID = getUUIDFromProjectName(projectTitle);
+  for (const project of projects) {
+    if (project.UUID === projectUUID) {
+      project.tasks.push(newTask);
+      apiCreateTask(newTask.UUID, newTask.title, newTask.description, format(newTask.dueDate, "yyyy-MM-dd"), newTask.priority, newTask.notes, projectUUID);
+      view.displayTasks(getAllTasksInProject(projectUUID), setFocusTask);
+      view.updateProjectTitle(project.title);
+    }
   }
-  projects[projectTitle].push(newTask);
-  view.displayTasks(getAllTasksInProject(projectTitle), setFocusTask);
-  view.updateProjectTitle(projectTitle);
 }
 
-function editTask(modifiedTask, projectTitle) {
-  const index = projects[projectTitle].findIndex(task => task.UUID === modifiedTask.UUID);
+function getUUIDFromProjectName(projectTitle) {
+  for (const project of projects) {
+    if (project.title === projectTitle) {
+      return project.UUID;
+    }
+  }
+}
+
+function editTask(modifiedTask, projectUUID) {
+  console.log(projectUUID);
+  let index = -1;
+  for (const project of projects) {
+    if (project.UUID === projectUUID) {
+      index = project.tasks.findIndex(task => task.UUID === modifiedTask.UUID);
+      break;
+    }
+  }
 
   // Check if the object was found
   if (index !== -1) {
     // Remove the object from the array
     projects[projectTitle].splice(index, 1);
-    addTask(modifiedTask, projectTitle);
+    addTask(modifiedTask, projectUUID);
   }
 }
 
@@ -102,7 +124,7 @@ function addProject(projectTitle) {
     throw new Error("Cannot assign duplicate project names");
   }
   projects[projectTitle] = [];
-  return getAllTasksInProject(projectTitle);
+  return getAllTasksInProject(projectUUID);
 }
 
 function editProject(newProjectTitle, oldProjectTitle) {
@@ -115,14 +137,14 @@ function editProject(newProjectTitle, oldProjectTitle) {
   }
   projects[newProjectTitle] = projects[oldProjectTitle];
   delete projects[oldProjectTitle];
-  view.populateProjectsIntoSelects(getProjectTitles());
+  view.populateProjectsIntoSelects(projects);
   
   return getAllTasksInProject(newProjectTitle);
 }
 
-function getAllTasksInProject(projectTitle) {
+function getAllTasksInProject(projectUUID) {
   for (const project of projects) {
-    if (project.title === projectTitle) {
+    if (project.UUID === projectUUID) {
       return project.tasks;
     }
   }
@@ -160,10 +182,10 @@ async function getAllProjects() {
 async function checkServerHealth() {
   try {
     await apiCheckServerHealth();
-    return true;
   } catch (error) {
-    console.error('Error:', error);
-    return false;
+    console.log("display error message");
+    view.displayErrorMessage("Could not establish connection to server");
+    throw new Error('Server health check failed: ' + error);
   }
 }
 

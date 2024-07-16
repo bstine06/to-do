@@ -20,21 +20,6 @@ async function apiGetAllProjects() {
     return data;
 }
 
-async function apiCreateTask(task) {
-    const response = await fetch(`${apiUrl}/create-task`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(task)
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    const data = await response.json();
-    return data;
-}
-
 async function apiGetAllTasksInProject(projectUUID) {
     const response = await fetch(`${apiUrl}/get-all-tasks-in-project`, {
       method: 'POST',
@@ -51,14 +36,41 @@ async function apiGetAllTasksInProject(projectUUID) {
 }
 
 async function apiCheckServerHealth() {
-  const response = await fetch(`${apiUrl}/health-check`);
-  if (!response.ok) {
-    throw new Error('Server health check failed: ' + response.statusText);
-  }
-  const data = await response.json();
-  if (data.status !== 'ok') {
+  try {
+    const response = await fetch(`${apiUrl}/health-check`);
+    if (!response.ok) {
+      throw new Error('Server health check failed: ' + response.statusText);
+    }
+    const data = await response.json();
+    if (data.status !== 'ok') {
+      throw new Error('Server health check failed: invalid status');
+    }
+    return data;
+  } catch (error) {
     throw new Error('Server health check failed: invalid status');
   }
+  
+}
+
+async function apiCreateTask(uuid, title, description, dueDate, priority, notes, projectUUID) {
+  console.log("IN API CREATE TASK");
+  const response = await fetch(`${apiUrl}/add-task`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  uuid: uuid,
+                            name: title,
+                            description: description,
+                            due_date: dueDate,
+                            priority: priority,
+                            notes: notes,
+                            project_uuid: projectUUID })
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok ' + response.statusText);
+  }
+  const data = await response.json();
   return data;
 }
 

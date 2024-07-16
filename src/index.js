@@ -3,7 +3,7 @@ import { Task } from './task.js';
 import { format } from 'date-fns';
 import {Project} from './project.js';
 import { View } from './view.js';
-import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth } from './api.js';
+import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth, apiRemoveTaskByUUID } from './api.js';
 
 let projects = [];
 
@@ -56,12 +56,14 @@ function getProjectUUIDs() {
   return projectUUIDs;
 }
 
-function handleCompleteElement(taskUUID, projectUUID) {
+async function handleCompleteElement(taskUUID, projectUUID) {
   console.log(`Complete element with UUID: ${taskUUID}`);
+  console.log(projects);
   const projectIndex = projects.findIndex(project => project.UUID === projectUUID);
   const taskIndex = projects[projectIndex].tasks.findIndex(task => task.UUID === taskUUID);
   console.log(projectIndex);
-  delete projects[projectIndex].tasks[taskIndex];
+  projects[projectIndex].tasks.splice(taskIndex, 1);
+  await removeTaskByUUID(taskUUID);
   view.displayTasks(projects[projectIndex].tasks, setFocusTask);
 }
 
@@ -186,6 +188,16 @@ async function checkServerHealth() {
     console.log("display error message");
     view.displayErrorMessage("Could not establish connection to server");
     throw new Error('Server health check failed: ' + error);
+  }
+}
+
+async function removeTaskByUUID(UUID) {
+  try {
+    await apiRemoveTaskByUUID(UUID);
+  } catch (error) {
+    console.log("display error message");
+    view.displayErrorMessage("Could not establish connection to server");
+    throw new Error('Lost connection to server: ' + error);
   }
 }
 

@@ -6,7 +6,11 @@ export class Project {
               UUID,
               tasks) {
     this.title = title;
-    this.tasks = tasks;
+    if (tasks != null) {
+      this.tasks = tasks;
+    } else {
+      this.tasks = [];
+    }
     if (UUID != null) {
       this.UUID = UUID;
     } else {

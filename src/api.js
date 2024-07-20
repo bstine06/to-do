@@ -74,6 +74,23 @@ async function apiCreateTask(uuid, title, description, dueDate, priority, notes,
   return data;
 }
 
+async function apiCreateProject(uuid, title) {
+  console.log("IN API CREATE PROJECT");
+  const response = await fetch(`${apiUrl}/add-project`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({  uuid: uuid,
+                            name: title })
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok ' + response.statusText);
+  }
+  const data = await response.json();
+  return data;
+}
+
 async function apiRemoveTaskByUUID(uuid) {
   const response = await fetch(`${apiUrl}/remove-task-by-uuid`, {
     method: 'POST',
@@ -90,4 +107,4 @@ async function apiRemoveTaskByUUID(uuid) {
 }
 
 // Export the functions to be used in other parts of the application
-export { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth, apiRemoveTaskByUUID };
+export { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiCreateProject, apiGetAllTasksInProject, apiCheckServerHealth, apiRemoveTaskByUUID };

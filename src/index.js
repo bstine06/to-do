@@ -3,7 +3,7 @@ import { Task } from './task.js';
 import { format } from 'date-fns';
 import {Project} from './project.js';
 import { View } from './view.js';
-import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiGetAllTasksInProject, apiCheckServerHealth, apiRemoveTaskByUUID } from './api.js';
+import { apiGetAllTasks, apiGetAllProjects, apiCreateTask, apiCreateProject, apiGetAllTasksInProject, apiCheckServerHealth, apiRemoveTaskByUUID } from './api.js';
 
 let projects = [];
 
@@ -16,8 +16,8 @@ view.setupNewTaskModalListeners();
 view.setupNewTaskSubmitListener(addTask);
 view.setupNewProjectModalListeners();
 view.setupNewProjectSubmitListener(addProject);
-view.setupProjectViewSelectListener(getAllTasksInProject, setFocusTask);
-view.setupProjectSelectListener(getAllTasksInProject, setFocusTask);
+view.setupProjectViewSelectListener(getProjectByUUID, setFocusTask);
+view.setupProjectSelectListener(getProjectByUUID, setFocusTask);
 view.setupEditProjectModalListeners();
 view.setupEditProjectSubmitListener(editProject);
 view.setupEditTaskSubmitListener(editTask);
@@ -33,9 +33,8 @@ async function initialize() {
     projects = await getAllProjects();
     await fetchAndPopulateAllTasksForAllProjects();
     view.displayTasks(projects[0].tasks, setFocusTask);
-    view.updateProjectTitle(projects[0].title);
+    view.updateFocusedProject(projects[0]);
     view.populateProjectsIntoSelects(projects);
-    console.log(projects);
   } catch (error) {
     console.error("An error occurred during initialization:", error);
   }
@@ -82,14 +81,14 @@ function getFocusTask(task) {
   return focusTask;
 }
 
-function addTask(newTask, projectTitle) {
-  const projectUUID = getUUIDFromProjectName(projectTitle);
+async function addTask(newTask, projectUUID) {
   for (const project of projects) {
     if (project.UUID === projectUUID) {
+      console.log(project);
       project.tasks.push(newTask);
-      apiCreateTask(newTask.UUID, newTask.title, newTask.description, format(newTask.dueDate, "yyyy-MM-dd"), newTask.priority, newTask.notes, projectUUID);
-      view.displayTasks(getAllTasksInProject(projectUUID), setFocusTask);
-      view.updateProjectTitle(project.title);
+      await apiCreateTask(newTask.UUID, newTask.title, newTask.description, format(newTask.dueDate, "yyyy-MM-dd"), newTask.priority, newTask.notes, projectUUID);
+      view.displayTasks(project.tasks, setFocusTask);
+      view.updateFocusedProject(project);
     }
   }
 }
@@ -120,34 +119,43 @@ function editTask(modifiedTask, projectUUID) {
   }
 }
 
-function addProject(projectTitle) {
+async function addProject(projectTitle) {
   //throw error if duplicate name is trying to be added
-  if (projects.hasOwnProperty(projectTitle)) {
-    throw new Error("Cannot assign duplicate project names");
+  for (const project of projects) {
+    if (project.title === projectTitle) {
+      throw new Error("Cannot assign duplicate project names");
+    }
   }
-  projects[projectTitle] = [];
-  return getAllTasksInProject(projectUUID);
-}
 
-function editProject(newProjectTitle, oldProjectTitle) {
-  //immediately return if its the same name
-  if (newProjectTitle === oldProjectTitle) return getAllTasksInProject(newProjectTitle);
-  
-  //throw error if duplicate name is trying to be added
-  if (projects.hasOwnProperty(newProjectTitle)) {
-    throw new Error("Cannot assign duplicate project names");
-  }
-  projects[newProjectTitle] = projects[oldProjectTitle];
-  delete projects[oldProjectTitle];
+  const newProject = new Project(projectTitle);
+  projects.push(newProject);
+
+  await apiCreateProject(newProject.UUID, newProject.title);
+  view.displayTasks(newProject.tasks);
   view.populateProjectsIntoSelects(projects);
-  
-  return getAllTasksInProject(newProjectTitle);
+  view.updateFocusedProject(newProject);
 }
 
-function getAllTasksInProject(projectUUID) {
+function editProject(projectUUID, newProjectTitle) {
+  const myProject = getProjectByUUID(projectUUID);
+  //immediately return if name is the same as previous
+  if (myProject.title === newProjectTitle) return myProject;
+
+  //throw error if duplicate name is trying to be added
+  for (const project of projects) {
+    if (project.title === newProjectTitle) {
+      throw new Error("Cannot assign duplicate project names");
+    }
+  }
+  myProject.title = newProjectTitle;
+  view.populateProjectsIntoSelects(projects);
+  return myProject;
+}
+
+function getProjectByUUID(projectUUID) {
   for (const project of projects) {
     if (project.UUID === projectUUID) {
-      return project.tasks;
+      return project;
     }
   }
   return undefined;

@@ -52,7 +52,6 @@ export class View {
   displayTasks(tasks, setFocusTaskCallback) {
     this.mainContent.innerHTML = "";
     if (tasks === undefined) {
-    console.log("NO TASKS TO DISPLAY");
     } else {
       tasks.forEach((task) => {
         const taskDisplayElement = this.createTaskDisplayElement(task, setFocusTaskCallback);
@@ -67,9 +66,9 @@ export class View {
     this.editProjectButton.style.display = "none";
   }
 
-  updateProjectTitle(title) {
-    this.projectTitle.innerHTML = title;
-    this.updateProjectSelects(title);
+  updateFocusedProject(project) {
+    this.projectTitle.innerHTML = project.title;
+    this.updateProjectSelects(project);
   }
 
   createTaskDisplayElement(task, setFocusTaskCallback) {
@@ -199,8 +198,7 @@ export class View {
       const projectTitle = formData.get("title");
 
       try {
-        this.displayTasks(addProjectCallback(projectTitle));
-        this.updateProjectTitle(projectTitle);
+        addProjectCallback(projectTitle);
         this.closeAndResetProjectModal();
       } catch (error) {
         this.newProjectModalErrorText.innerHTML = error.message;
@@ -233,27 +231,27 @@ export class View {
     return option;
 }
 
-  updateProjectSelects(projectTitle) {
-    this.projectViewSelect.text = projectTitle;
-    this.projectSelect.text = projectTitle;
-    this.editTaskProjectSelect.text = projectTitle;
+  updateProjectSelects(project) {
+    this.projectViewSelect.value = project.UUID;
+    this.projectSelect.value = project.UUID;
+    this.editTaskProjectSelect.value = project.UUID;
   }
 
-  setupProjectViewSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
+  setupProjectViewSelectListener(getProjectByUUIDCallback, setFocusTaskCallback) {
     this.projectViewSelect.addEventListener("change", (event) => {
       const projectUUID = this.projectViewSelect.value;
-      const projectTitle = this.projectViewSelect.options[this.projectViewSelect.selectedIndex].innerHTML;
-      this.displayTasks(getAllTasksInProjectCallback(projectUUID), setFocusTaskCallback);
-      this.updateProjectTitle(projectTitle);
+      const myProject = getProjectByUUIDCallback(projectUUID);
+      this.displayTasks(myProject.tasks, setFocusTaskCallback);
+      this.updateFocusedProject(myProject);
     });
   }
 
   setupProjectSelectListener(getAllTasksInProjectCallback, setFocusTaskCallback) {
     this.projectSelect.addEventListener("change", (event) => {
       const projectUUID = this.projectSelect.value;
-      const projectTitle = this.projectSelect.options[this.projectSelect.selectedIndex].innerHTML;
-      this.displayTasks(getAllTasksInProjectCallback(projectUUID), setFocusTaskCallback);
-      this.updateProjectTitle(projectTitle);
+      const myProject = getProjectByUUIDCallback(projectUUID);
+      this.displayTasks(myProject.tasks, setFocusTaskCallback);
+      this.updateFocusedProject(myProject);
     });
   }
 
@@ -274,15 +272,17 @@ export class View {
       // Retrieve form data
       const formData = new FormData(this.editProjectForm);
       const newProjectTitle = formData.get("title");
-      const oldProjectTitle = this.projectTitle.innerHTML;
+      const projectUUID = this.projectViewSelect.value;
 
       try {
-        this.displayTasks(editProjectCallback(newProjectTitle, oldProjectTitle));
-        this.updateProjectTitle(newProjectTitle);
+        const myProject = editProjectCallback(projectUUID, newProjectTitle);
+        this.displayTasks(myProject.tasks);
+        this.updateFocusedProject(myProject);
 
         this.closeAndResetEditProjectModal();
       } catch (error) {
         this.editProjectModalErrorText.innerHTML = error.message;
+        console.error(error.message);
       }
       
     });
@@ -305,7 +305,6 @@ export class View {
     this.taskDetailsUUID.innerHTML = task.UUID;
 
     this.taskDetailsModal.style.display = "block";
-    console.log(task.UUID);
   }
 
   closeTaskDetailsModal() {
@@ -343,7 +342,6 @@ export class View {
       const formData = new FormData(this.editTaskForm);
       const taskTitle = formData.get("title");
       const taskDescription = formData.get("description");
-      console.log(formData.get("due-date"));
       const taskDueDate = new Date(formData.get("due-date"));
       const taskPriority = formData.get("edit-task-priority");
       const taskNotes = formData.get("notes");
